@@ -279,3 +279,63 @@ sumExp_(Tokens0, Return) :-
 
 	Return = Tokens0.
 
+sumop(Tokens0, Return) :-
+    assertToken(sumop('+'), Tokens0, Tokens1),
+    Return = Tokens1;
+    assertToken(sumop('-'), Tokens0, Tokens1),
+    Return = Tokens1.
+
+mulExp(Tokens0, Return) :-
+    unaryExp(Tokens0, Tokens1),
+    mulExp_(Tokens1, Return).
+
+mulExp_(Tokens0, Return) :-
+    mulop(Tokens0, Tokens1),
+    unaryExp(Tokens1, Tokens2),
+    mulExp_(Tokens2, Tokens3),
+    Return = Tokens3;
+    Return = Tokens0.
+
+mulop(Tokens0, Return) :-
+    assertToken(mulop('*'), Tokens0, Tokens1),
+    Return = Tokens1;
+    assertToken(mulop('/'), Tokens0, Tokens1),
+    Return = Tokens1;
+    assertToken(mulop('%'), Tokens0, Tokens1),
+    Return = Tokens1.
+
+unaryExp(Tokens0, Return) :-
+    unaryop(Tokens0, Tokens1),
+    unaryExp(Tokens1, Return);
+    factor(Tokens0, Return).
+
+unaryop(Tokens0, Return) :-
+    assertToken(unaryop('-'), Tokens0, Return).
+
+factor(Tokens0, Return) :-
+    mutable(Tokens0, Return);
+    immutable(Tokens0, Return).
+
+mutable(Tokens0, Return) :-
+    assertId(Tokens0, Return).
+
+immutable(Tokens0, Return) :-
+    assertToken(left_paren, Tokens0, Tokens1),
+    exp(Tokens1, Tokens2),
+    assertToken(right_paren, Tokens2, Return);
+    constant(Tokens0, Return).
+
+constant(Tokens0, Return) :-
+    assertToken(numconst, Tokens0, Return);
+    assertToken(charconst, Tokens0, Return);
+    assertToken(true, Tokens0, Return);
+    assertToken(false, Tokens0, Return).
+
+and(Tokens0, Return) :-
+    assertToken(and, Tokens0, Return).
+
+or(Tokens0, Return) :-
+    assertToken(or, Tokens0, Return).
+
+not(Tokens0, Return) :-
+    assertToken(not, Tokens0, Return).
